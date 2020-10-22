@@ -3,6 +3,26 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class AlgoritmoGenetico {
+
+    public int[][] mutação(int[][] filhos) {
+        Random rand = new Random();
+        boolean mutado = false;
+        for(int i = 0; i < filhos.length; i++) {
+            int rolagem = rand.nextInt(101);
+            if(rolagem >= 40) {
+                while (!mutado) {
+                    int mutagene1 = rand.nextInt(filhos[i].length + 1);
+                    int mutagene2 = rand.nextInt(filhos[i].length + 1);
+                    if (mutagene1 != mutagene2 && filhos[i][mutagene1] < 0) {
+                        filhos[i][mutagene1] -= 1;
+                        filhos[i][mutagene2] += 1;
+                        mutado = true;
+                    }
+                }
+            }
+        }
+        return filhos;
+    }
     public static void main(String[] args) {
 
         Boolean fim = false; // usada para finalizar o programa
