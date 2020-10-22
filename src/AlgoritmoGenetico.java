@@ -1,8 +1,9 @@
+import java.util.ArrayList;
+import java.util.Random;
 import java.util.Scanner;
 
 public class AlgoritmoGenetico {
     public static void main(String[] args) {
-        //// Leitura dos dados
 
         Boolean fim = false; // usada para finalizar o programa
 
@@ -21,6 +22,8 @@ public class AlgoritmoGenetico {
                 }
                 else
                 {
+                    //// Leitura dos dados
+
                     // [n][0] representa a duração de cada brinquedo
                     // [n][1] representa os pontos de cada brinquedo
                     int brinquedos[][] = new int[n][2];
@@ -42,6 +45,7 @@ public class AlgoritmoGenetico {
                     }
 
                     if(parar){
+                        fim = true;
                         break;
                     }
 
@@ -50,14 +54,35 @@ public class AlgoritmoGenetico {
                         System.out.println(brinquedos[i][0] + " | " + brinquedos[i][1]);
                     }
 
-                    // Algoritmo genético
-                        // Criar a população inicial
-                        // Entra no ciclo
-                            // Aplica método de Seleção para encontrar os pais da próxima geração
-                            // Utiliza os pais como parametros para os métodos de Crusamento e Mutação
-                            // Verifica a condição de parada
-                                // SIM: o programa encerra e retorna o melhor valor encontrado
-                                // NÃO: o programa retorna para o inicio do ciclo
+                    //// Algoritmo genético
+
+                    // Criar a população inicial
+                    int população[][] = new int[100][n];
+
+                    for(int i = 0; i < 100; i++){
+                        for(int j = 0; j < n; j++){
+                            Random rand = new Random();
+                            população[i][j] = rand.nextInt(11); // Cada item pode aparecer de 0 a 10 vezes
+                        }
+                    }
+
+                    //////////////////////////////
+                    // Tudo que esse for faz é printar os 100 individuos que compoem a população inicial
+                    for(int i = 0; i < 100; i++){
+                        System.out.print((i+1) + " - [");
+                        for(int j = 0; j < n; j++){
+                            System.out.print(população[i][j] + ", ");
+                        }
+                        System.out.println("]");
+                    }
+                    //////////////////////////////
+
+                    //// Entra no ciclo
+                        // Aplica método de Seleção para encontrar os pais da próxima geração
+                        // Utiliza os pais como parametros para os métodos de Crusamento e Mutação
+                        // Verifica a condição de parada
+                            // SIM: o programa encerra e retorna o melhor valor encontrado
+                            // NÃO: o programa retorna para o inicio do ciclo
                 }
             }
             else // caso os valores de N ou T estejam invalidos ele entra nesse else
