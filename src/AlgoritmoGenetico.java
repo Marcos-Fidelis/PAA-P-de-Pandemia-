@@ -3,7 +3,6 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class AlgoritmoGenetico {
-    /*
     static ArrayList<Integer[]> mutação(ArrayList<Integer[]> filhos) {
         Random rand = new Random();
         boolean mutado = false;
@@ -23,8 +22,6 @@ public class AlgoritmoGenetico {
         }
         return filhos;
     }
-     */
-
     static Integer[] mutação(Integer[] individuo) {
         boolean bug = true;
         for(int i = 0; i < individuo.length; i++){
