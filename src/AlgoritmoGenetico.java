@@ -3,38 +3,8 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class AlgoritmoGenetico {
-
-
-    public void copiaIndividuos(int[] a, int[] b, int[] c, int[] d) {
-        for(int i = 0; i < a.length; i++) {
-            c[i] = a[i];
-            d[i] = b[i];
-        }
-    }
-
-    public boolean verificaNovosIndividuos(ArrayList<int[]> individuos, int[][] brinquedos, int tempo) {
-        int a[] = individuos.get(0);
-        int b[] = individuos.get(1);
-
-        int i = 0;
-
-        int verifica_tempo_a = 0;
-        int verifica_tempo_b = 0;
-
-        while(i < a.length) {
-            verifica_tempo_a = a[i]*brinquedos[i][1];
-            verifica_tempo_b = b[i]*brinquedos[i][1];
-            i++;
-        }
-
-        if(verifica_tempo_a > tempo || verifica_tempo_b > tempo) {
-            return false;
-        }
-
-        return true;
-    }
-
-    public  ArrayList<int[]> mutação(ArrayList<int[]> filhos) {
+    /*
+    static ArrayList<Integer[]> mutação(ArrayList<Integer[]> filhos) {
         Random rand = new Random();
         boolean mutado = false;
         for(int i = 0; i < filhos.size(); i++) {
@@ -53,44 +23,42 @@ public class AlgoritmoGenetico {
         }
         return filhos;
     }
+     */
 
-
-    public ArrayList<int[]> crossover(int[] a, int[] b, int[][] brinquedos, int tempo, int crossoverTry) {
-        Random aleatorizador = new Random();
-        ArrayList<int[]> novosIndividuos = new ArrayList<int[]>();
-        int numeroAleatorio = aleatorizador.nextInt(a.length);
-
-        int c[] = new int[a.length];
-        int d[] = new int[b.length];
-
-        copiaIndividuos(a, b, c, d);
-
-        for(int i = numeroAleatorio; i < a.length; i++) {
-            int auxA = c[i];
-            int auxB = d[i];
-
-            c[i] = auxB;
-            d[i] = auxA;
+    static Integer[] mutação(Integer[] individuo) {
+        Random rand = new Random();
+        boolean mutado = false;
+        int rolagem = rand.nextInt(101);
+        int mutagene1, mutagene2;
+        if (rolagem <= 40) {
+            while (!mutado) {
+                mutagene1 = rand.nextInt(individuo.length );
+                mutagene2 = rand.nextInt(individuo.length);
+                if (mutagene1 != mutagene2 && individuo[mutagene1] != 0) {
+                    individuo[mutagene1] -= 1;
+                    individuo[mutagene2] += 1;
+                    mutado = true;
+                }
+            }
         }
-
-        novosIndividuos.add(c);
-        novosIndividuos.add(d);
-
-        if(verificaNovosIndividuos(novosIndividuos, brinquedos, tempo)) {
-            novosIndividuos = mutação(novosIndividuos);
-            return novosIndividuos;
-        }
-        else if(crossoverTry < 5){
-            crossoverTry++;
-            return crossover(a, b, brinquedos, tempo, crossoverTry);
-        }
-        else {
-            return null;
-        }
-
+        return individuo;
     }
 
-    public int verificaAptidao (int[] individuo, int[][] elementos, int tempoMax) {
+    static Integer[] crossover(Integer[] p1, Integer[] p2) {
+        Random aleatorizador = new Random();
+        int numeroAleatorio = aleatorizador.nextInt(p1.length);
+
+        Integer[] novo_individuo = p1.clone();
+
+        for(int i = numeroAleatorio; i < p1.length; i++) {
+            novo_individuo[i] = p2[i];
+        }
+
+        return novo_individuo;
+    }
+
+    //// CORRETA
+    static int verificaAptidao (Integer[] individuo, int[][] elementos, int tempoMax) {
         int valor = 0;
         int peso = 0;
         for (int a = 0; a < individuo.length; a++) {
@@ -107,15 +75,16 @@ public class AlgoritmoGenetico {
         return valor;
     }
 
-
     public static void main(String[] args) {
         //// Variaveis usadas para alterar as configurações do algoritmo genetico
-        int TAM_POPULACAO = 100;
+        int TAM_POPULACAO = 20;
 
-        float aux = (float)(2 * TAM_POPULACAO/3);
-        int N_PAIS_MAX = Math.round(aux);
+        float aux = (float)(TAM_POPULACAO/3);
+        int N_PAIS = Math.round(aux);
 
-        float mutation_chance = 0.10f;
+        int N_MAX_INTERACOES = 10000;
+
+        float mutation_chance = 0.05f;
 
         // usada para finalizar o programa
         boolean terminar_programa = false;
@@ -159,13 +128,7 @@ public class AlgoritmoGenetico {
                     }
 
                     if(entrada_invalida){
-                        terminar_programa = true;
                         break;
-                    }
-
-                    System.out.println("\nValores do vetor (" + n + ", " + t + "):");
-                    for(int i = 0; i < n; i++){
-                        System.out.println(brinquedos[i][0] + " | " + brinquedos[i][1]);
                     }
 
                     //// Algoritmo genetico
@@ -173,11 +136,11 @@ public class AlgoritmoGenetico {
                     // Criar a populacao inicial
                     ArrayList<Integer[]> populacao = new ArrayList<Integer[]>();
 
-                    for(int i = 0; i < 100; i++){
+                    for(int i = 0; i < TAM_POPULACAO; i++){
                         Integer[] ind = new Integer[n];
+                        Random rand = new Random();
                         for(int j = 0; j < n; j++){
-                            Random rand = new Random();
-                            ind[j] = rand.nextInt(11); // Cada brinquedo pode aparecer de 0 a 10 vezes
+                            ind[j] = rand.nextInt(3); // Cada brinquedo pode aparecer de 0 a 10 vezes
                         }
                         populacao.add(ind);
                     }
@@ -193,50 +156,80 @@ public class AlgoritmoGenetico {
                         // Aplica metodo de Selecao para encontrar os pais da proxima geracao
                         ArrayList<Integer[]> pais = new ArrayList<Integer[]>();
 
-                        int soma_fitness = 0;
+                        int somatorio = 0;
                         int contador = 0;
 
                         for(int i = 0; i < TAM_POPULACAO; i++){
-                            soma_fitness += Fitness(populacao.get(i));
+                            somatorio += verificaAptidao(populacao.get(i), brinquedos, t);
                         }
-                        for(int i = 0; i < TAM_POPULACAO; i++){
-                            contador++;
 
-                            if(contador > N_PAIS_MAX){
-                                break;
-                            }
-                            else
-                            {
-                                float i_fitness = Fitness(populacao.get(i));
-                                float i_prop = i_fitness/soma_fitness;
+                        while(contador < N_PAIS){
+                            for(int i = 0; i < TAM_POPULACAO; i++){
+                                if(contador >= N_PAIS){
+                                    break;
+                                }
 
                                 Random rand = new Random();
-                                if(i_prop <= rand.nextFloat()  && i_prop != 0){
-                                    pais.add(populacao.get(i));
+
+                                float prob = (float)verificaAptidao(populacao.get(i), brinquedos, t) / somatorio;
+
+                                int i_prob = Math.round(prob * 100);
+
+                                int chance = rand.nextInt(100) + 1;
+
+                                if(chance < i_prob){
+                                    pais.add(populacao.get(i).clone());
+                                    contador++;
                                 }
                             }
                         }
 
-                        // Utiliza os pais como parametros para os metodos de Crusamento e Mutacao
                         populacao.clear();
-
+                        populacao.addAll(pais);
+                        // Utiliza os pais como parametros para os metodos de Crusamento e Mutacao
                         // funcao de crusamento
-                        // funcao de mutacao
+                        while(contador < TAM_POPULACAO){
+                            for(int i = 0; i < pais.size(); i++){
+                                if(contador >= TAM_POPULACAO){
+                                    break;
+                                }
 
-                        if(num_interacoes >= 10){
+                                if(i+1 == pais.size()) {
+                                    populacao.add(crossover(pais.get(i), pais.get(0)));
+                                }
+                                else {
+                                    populacao.add(crossover(pais.get(i), pais.get(i+1)));
+                                }
+                                contador++;
+                            }
+                        }
+
+                        // funcao de mutacao
+                        for(int i = 0; i < TAM_POPULACAO; i++){
+                            Random rand = new Random();
+                            if(rand.nextFloat() <= mutation_chance){
+                                populacao.add(mutação(populacao.get(i)));
+                                populacao.remove(i);
+                                i--;
+                            }
+                        }
+
+                        // Função de termino das iteracoes
+                        if(num_interacoes >= N_MAX_INTERACOES){
                             populacao_final = true;
                         }
+                        // System.out.println("Num interacoes = " + num_interacoes);
                     }while(!populacao_final);
 
-                    int[] melhor_ind = new int[n];
+                    Integer[] melhor_ind = new Integer[n];
 
                     for(int i = 0; i < n; i++){
                         melhor_ind[i] = 0;
                     }
 
                     for(int i = 0; i < TAM_POPULACAO; i++){
-                        int melhor_fit = Fitness(melhor_ind);
-                        int new_fit = Fitness(populacao.get(i));
+                        int melhor_fit = verificaAptidao(melhor_ind, brinquedos, t);
+                        int new_fit = verificaAptidao(populacao.get(i), brinquedos, t);
 
                         if(new_fit > melhor_fit){
                             for(int j = 0; j < n; j++)
@@ -246,9 +239,9 @@ public class AlgoritmoGenetico {
                         }
                     }
 
-                    System.out.println("Instancia " + n_interacoes);
-                    System.out.println(Fitness(melhor_ind));
                     n_interacoes++;
+                    System.out.println("Instancia " + n_interacoes);
+                    System.out.println(verificaAptidao(melhor_ind, brinquedos, t) + "\n");
                 }
             }
             else // caso os valores de N ou T estejam invalidos ele entra nesse else
