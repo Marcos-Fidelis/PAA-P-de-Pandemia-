@@ -23,6 +23,25 @@ public class AlgoritmoGenetico {
         }
         return filhos;
     }
+
+    public int verificaAptidao (int[] individuo, int[][] elementos, int tempoMax) {
+        int valor = 0;
+        int peso = 0;
+        for (int a = 0; a < individuo.length; a++) {
+            peso += individuo[a]*elementos[a][0];
+        }
+        if (peso > tempoMax) {
+            valor = 0;
+        }
+        else {
+            for (int a = 0; a < individuo.length; a++) {
+                valor += individuo[a]*elementos[a][1];
+            }
+        }
+        return valor;
+    }
+
+
     public static void main(String[] args) {
 
         Boolean fim = false; // usada para finalizar o programa
