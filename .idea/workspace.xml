@@ -26,8 +26,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f7940ff7-0849-44aa-a56e-3a3562bb30cb" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/PAA-P-de-Pandemia/AlgoritmoGenetico.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/AlgoritmoGenetico.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/AlgoritmoGenetico.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
