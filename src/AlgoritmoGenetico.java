@@ -3,6 +3,111 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class AlgoritmoGenetico {
+
+
+    public void copiaIndividuos(int[] a, int[] b, int[] c, int[] d) {
+        for(int i = 0; i < a.length; i++) {
+            c[i] = a[i];
+            d[i] = b[i];
+        }
+    }
+
+    public boolean verificaNovosIndividuos(ArrayList<int[]> individuos, int[][] brinquedos, int tempo) {
+        int a[] = individuos.get(0);
+        int b[] = individuos.get(1);
+
+        int i = 0;
+
+        int verifica_tempo_a = 0;
+        int verifica_tempo_b = 0;
+
+        while(i < a.length) {
+            verifica_tempo_a = a[i]*brinquedos[i][1];
+            verifica_tempo_b = b[i]*brinquedos[i][1];
+            i++;
+        }
+
+        if(verifica_tempo_a > tempo || verifica_tempo_b > tempo) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public  ArrayList<int[]> mutação(ArrayList<int[]> filhos) {
+        Random rand = new Random();
+        boolean mutado = false;
+        for(int i = 0; i < filhos.size(); i++) {
+            int rolagem = rand.nextInt(101);
+            if(rolagem >= 40) {
+                while (!mutado) {
+                    int mutagene1 = rand.nextInt(filhos.get(i).length + 1);
+                    int mutagene2 = rand.nextInt(filhos.get(i).length + 1);
+                    if (mutagene1 != mutagene2 && filhos.get(i)[mutagene1] < 0) {
+                        filhos.get(i)[mutagene1] -= 1;
+                        filhos.get(i)[mutagene2] += 1;
+                        mutado = true;
+                    }
+                }
+            }
+        }
+        return filhos;
+    }
+
+
+    public ArrayList<int[]> crossover(int[] a, int[] b, int[][] brinquedos, int tempo, int crossoverTry) {
+        Random aleatorizador = new Random();
+        ArrayList<int[]> novosIndividuos = new ArrayList<int[]>();
+        int numeroAleatorio = aleatorizador.nextInt(a.length);
+
+        int c[] = new int[a.length];
+        int d[] = new int[b.length];
+
+        copiaIndividuos(a, b, c, d);
+
+        for(int i = numeroAleatorio; i < a.length; i++) {
+            int auxA = c[i];
+            int auxB = d[i];
+
+            c[i] = auxB;
+            d[i] = auxA;
+        }
+
+        novosIndividuos.add(c);
+        novosIndividuos.add(d);
+
+        if(verificaNovosIndividuos(novosIndividuos, brinquedos, tempo)) {
+            novosIndividuos = mutação(novosIndividuos);
+            return novosIndividuos;
+        }
+        else if(crossoverTry < 5){
+            crossoverTry++;
+            return crossover(a, b, brinquedos, tempo, crossoverTry);
+        }
+        else {
+            return null;
+        }
+
+    }
+
+    public int verificaAptidao (int[] individuo, int[][] elementos, int tempoMax) {
+        int valor = 0;
+        int peso = 0;
+        for (int a = 0; a < individuo.length; a++) {
+            peso += individuo[a]*elementos[a][0];
+        }
+        if (peso > tempoMax) {
+            valor = 0;
+        }
+        else {
+            for (int a = 0; a < individuo.length; a++) {
+                valor += individuo[a]*elementos[a][1];
+            }
+        }
+        return valor;
+    }
+
+
     public static void main(String[] args) {
         //// Variaveis usadas para alterar as configurações do algoritmo genetico
         int TAM_POPULACAO = 100;
