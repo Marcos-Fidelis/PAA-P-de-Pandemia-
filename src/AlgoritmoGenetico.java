@@ -26,13 +26,24 @@ public class AlgoritmoGenetico {
      */
 
     static Integer[] mutação(Integer[] individuo) {
+        boolean bug = true;
+        for(int i = 0; i < individuo.length; i++){
+            if(individuo[i] != 0){
+                bug = false;
+            }
+        }
+
         Random rand = new Random();
-        boolean mutado = false;
-        int rolagem = rand.nextInt(101);
-        int mutagene1, mutagene2;
-        if (rolagem <= 40) {
+
+        if(bug){
+            int index = rand.nextInt(individuo.length);
+            individuo[index]++;
+        }
+        else{
+            boolean mutado = false;
+            int mutagene1, mutagene2;
             while (!mutado) {
-                mutagene1 = rand.nextInt(individuo.length );
+                mutagene1 = rand.nextInt(individuo.length);
                 mutagene2 = rand.nextInt(individuo.length);
                 if (mutagene1 != mutagene2 && individuo[mutagene1] != 0) {
                     individuo[mutagene1] -= 1;
@@ -77,14 +88,14 @@ public class AlgoritmoGenetico {
 
     public static void main(String[] args) {
         //// Variaveis usadas para alterar as configurações do algoritmo genetico
-        int TAM_POPULACAO = 20;
+        int TAM_POPULACAO = 100;
 
-        float aux = (float)(TAM_POPULACAO/3);
+        float aux = (float)(TAM_POPULACAO/2);
         int N_PAIS = Math.round(aux);
 
         int N_MAX_INTERACOES = 10000;
 
-        float mutation_chance = 0.05f;
+        float mutation_chance = 0.25f;
 
         // usada para finalizar o programa
         boolean terminar_programa = false;
@@ -131,6 +142,15 @@ public class AlgoritmoGenetico {
                         break;
                     }
 
+                    //// Otimização
+                    int maior_peso = 0;
+                    for(int i = 0; i < n; i++){
+                        if(brinquedos[i][0] > maior_peso && maior_peso <= t){
+                            maior_peso = brinquedos[i][0];
+                        }
+                    }
+
+                    //int MAX_VALUE = Math.round((float)t/maior_peso) + 2;
                     //// Algoritmo genetico
 
                     // Criar a populacao inicial
@@ -140,7 +160,7 @@ public class AlgoritmoGenetico {
                         Integer[] ind = new Integer[n];
                         Random rand = new Random();
                         for(int j = 0; j < n; j++){
-                            ind[j] = rand.nextInt(3); // Cada brinquedo pode aparecer de 0 a 10 vezes
+                            ind[j] = rand.nextInt(t/n); // Cada brinquedo pode aparecer de 0 a 10 vezes
                         }
                         populacao.add(ind);
                     }
@@ -160,27 +180,51 @@ public class AlgoritmoGenetico {
                         int contador = 0;
 
                         for(int i = 0; i < TAM_POPULACAO; i++){
-                            somatorio += verificaAptidao(populacao.get(i), brinquedos, t);
+                            if(verificaAptidao(populacao.get(i),brinquedos,t) != 0){
+                                somatorio += verificaAptidao(populacao.get(i), brinquedos, t);
+                            }
+                            else {
+                                Integer[] ind = new Integer[n];
+                                Random rand = new Random();
+                                for(int j = 0; j < n; j++){
+                                    ind[j] = rand.nextInt(t/n); // Cada brinquedo pode aparecer de 0 a 10 vezes
+                                }
+                                somatorio += verificaAptidao(ind, brinquedos, t);
+                                populacao.add(i, ind);
+                                populacao.remove(i+1);
+                            }
                         }
 
-                        while(contador < N_PAIS){
+                        if(somatorio != 0){
+                            int[] probs_index = new int[TAM_POPULACAO];
+
                             for(int i = 0; i < TAM_POPULACAO; i++){
-                                if(contador >= N_PAIS){
-                                    break;
-                                }
-
-                                Random rand = new Random();
-
                                 float prob = (float)verificaAptidao(populacao.get(i), brinquedos, t) / somatorio;
+                                probs_index[i] = Math.round(prob * 100);
+                            }
 
-                                int i_prob = Math.round(prob * 100);
-
+                            while(contador < N_PAIS){
+                                Random rand = new Random();
+                                int acumulada = 0;
                                 int chance = rand.nextInt(100) + 1;
 
-                                if(chance < i_prob){
-                                    pais.add(populacao.get(i).clone());
-                                    contador++;
+                                for(int i = 0; i < TAM_POPULACAO; i++){
+                                    acumulada += probs_index[i];
+
+                                    if(acumulada >= chance){
+                                        pais.add(populacao.get(i).clone());
+                                        contador++;
+                                        break;
+                                    }
                                 }
+                            }
+                        }
+                        else{
+                            Random rand = new Random();
+                            while(contador < N_PAIS){
+                                int index = rand.nextInt(populacao.size());
+                                pais.add(populacao.get(index).clone());
+                                contador++;
                             }
                         }
 
@@ -208,7 +252,7 @@ public class AlgoritmoGenetico {
                         for(int i = 0; i < TAM_POPULACAO; i++){
                             Random rand = new Random();
                             if(rand.nextFloat() <= mutation_chance){
-                                populacao.add(mutação(populacao.get(i)));
+                                populacao.add(mutação(populacao.get(i)).clone());
                                 populacao.remove(i);
                                 i--;
                             }
