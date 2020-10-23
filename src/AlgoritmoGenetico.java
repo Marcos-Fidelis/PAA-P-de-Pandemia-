@@ -34,6 +34,7 @@ public class AlgoritmoGenetico {
         return true;
     }
 
+    /*
     public  ArrayList<int[]> mutação(ArrayList<int[]> filhos) {
         Random rand = new Random();
         boolean mutado = false;
@@ -53,6 +54,33 @@ public class AlgoritmoGenetico {
         }
         return filhos;
     }
+    * mantive ainda a função antiga caso a nova não funcione bem. caso funcione bem apagar esse comentario dps
+    */
+
+    // mutação acontece em cada indivíduo, acontece durante a criação de indivíduos
+    public int[] mutação(int[] individuo) {
+        Random rand = new Random();
+        boolean mutado = false;
+        int rolagem = rand.nextInt(101);
+        int mutagene1, mutagene2;
+        if (rolagem <= 40) {
+            while (!mutado) {
+                mutagene1 = rand.nextInt(individuo.length + 1);
+                mutagene2 = rand.nextInt(individuo.length + 1);
+                if (mutagene1 != mutagene2 && individuo[mutagene1] != 0) {
+                    individuo[mutagene1] -= 1;
+                    individuo[mutagene2] += 1;
+                    mutado = true;
+                }
+            }
+        }
+        return individuo;
+    }
+
+
+
+
+
 
 
     public ArrayList<int[]> crossover(int[] a, int[] b, int[][] brinquedos, int tempo, int crossoverTry) {
@@ -68,16 +96,17 @@ public class AlgoritmoGenetico {
         for(int i = numeroAleatorio; i < a.length; i++) {
             int auxA = c[i];
             int auxB = d[i];
-
+            //cada vez q um individuo é criado é rodada nele a probabilidade de mutação
             c[i] = auxB;
+            c = mutação(c);
             d[i] = auxA;
+            d = mutação(d);
         }
 
         novosIndividuos.add(c);
         novosIndividuos.add(d);
 
         if(verificaNovosIndividuos(novosIndividuos, brinquedos, tempo)) {
-            novosIndividuos = mutação(novosIndividuos);
             return novosIndividuos;
         }
         else if(crossoverTry < 5){
